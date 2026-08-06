@@ -1,6 +1,8 @@
 "use client"
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Header from "./components/Header";
+
 
 
 // import { Link } from "lucide-react";
@@ -9,6 +11,7 @@ import { Edit, Mail, MessageCircle } from "lucide-react";
 export default function Home() {
   return (
     <div>
+      <Header />
       <div className="mt-4 flex justify-center items-center ">
     <motion.div
       initial={{ opacity: 0, y: 60 }}      // start lower + invisible
@@ -89,7 +92,7 @@ export default function Home() {
       </p>
       <p className="text-center mt-8 text-2xl md:text-3xl">
         <Link
-          href="/Login"
+          href="/auth"
           className="text-blue-700 underline hover:text-blue-600"
         >
           Sign up here
