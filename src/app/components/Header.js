@@ -1,55 +1,38 @@
 "use client";
-import { motion } from "framer-motion";
+
 import Link from "next/link";
-import { Heart, Menu as MenuIcon } from "lucide-react";
+import { Heart, Menu, X } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useState } from "react";
+
+const links = [
+  { href: "/#how-it-works", label: "How it works" },
+  { href: "/#community", label: "Community" },
+  { href: "/auth/Login", label: "Log in" },
+];
 
 export default function Header() {
+  const [open, setOpen] = useState(false);
   return (
-    <div className="border-b border-purple-300 py-2 md:px-4 flex justify-between items-center text-blue-700 font-bold text-3xl md:text-5xl">
-      
-      {/* LEFT SIDE — "Confesso" sliding in from left */}
-      <motion.div
-        initial={{ opacity: 0, x: -40 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
-      >
-        <Link className="flex gap-2" href="/">
-          Confesso <Heart size={35} className="md:w-12 md:h-12" />
+    <header className="site-header">
+      <nav className="site-nav" aria-label="Main navigation">
+        <Link className="brand" href="/" onClick={() => setOpen(false)}>
+          <span>confesso</span><Heart aria-hidden="true" size={22} fill="currentColor" />
         </Link>
-      </motion.div>
-
-      {/* MOBILE MENU BUTTON */}
-      <button className="lg:hidden">
-        <MenuIcon />
-      </button>
-
-       {/* RIGHT SIDE LINKS — sliding in from right  */}
-      <motion.div
-        initial={{ opacity: 0, x: 40 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
-        className="lg:w-[50%] hidden lg:flex lg:justify-between"
-      >
-        <Link
-          href="/About"
-          className="px-3 underline rounded-lg hover:bg-blue-700 hover:text-white transition"
-        >
-          About Us
-        </Link>
-        <Link
-          href="/Login"
-          className="px-3 underline rounded-lg hover:bg-blue-700 hover:text-white transition"
-        >
-          Log In
-        </Link>
-        <Link
-          href="/Logout"
-          className="px-3 border border-blue-700 rounded-lg hover:bg-blue-700 hover:text-white transition"
-        >
-          Log Out
-        </Link>
-      </motion.div>
-
-    </div>
+        <div className="nav-links">
+          {links.map((link) => <Link key={link.href} href={link.href}>{link.label}</Link>)}
+          <Link className="nav-cta" href="/auth">Share anonymously</Link>
+        </div>
+        <button className="menu-button" type="button" aria-label={open ? "Close navigation" : "Open navigation"} aria-expanded={open} onClick={() => setOpen(!open)}>
+          {open ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+        </button>
+      </nav>
+      <AnimatePresence>
+        {open && <motion.div className="mobile-menu" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
+          {links.map((link) => <Link key={link.href} href={link.href} onClick={() => setOpen(false)}>{link.label}</Link>)}
+          <Link className="nav-cta" href="/auth" onClick={() => setOpen(false)}>Share anonymously</Link>
+        </motion.div>}
+      </AnimatePresence>
+    </header>
   );
 }

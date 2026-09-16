@@ -1,104 +1,115 @@
-"use client"
-import { motion } from "framer-motion";
+"use client";
+
 import Link from "next/link";
+import { motion } from "framer-motion";
+import {
+  ArrowRight,
+  EyeOff,
+  HeartHandshake,
+  PenLine,
+  Send,
+} from "lucide-react";
 import Header from "./components/Header";
 
-
-
-// import { Link } from "lucide-react";
-import { Edit, Mail, MessageCircle } from "lucide-react";
+const steps = [
+  {
+    icon: PenLine,
+    title: "Put it into words",
+    text: "Write what you have been carrying, at your own pace.",
+  },
+  {
+    icon: EyeOff,
+    title: "Keep your name out of it",
+    text: "Your confession belongs to the story, not your identity.",
+  },
+  {
+    icon: HeartHandshake,
+    title: "Feel less alone",
+    text: "Read gentle, honest words from people who understand.",
+  },
+];
 
 export default function Home() {
   return (
-    <div>
+    <main>
       <Header />
-      <div className="mt-4 flex justify-center items-center ">
-    <motion.div
-      initial={{ opacity: 0, y: 60 }}      // start lower + invisible
-      animate={{ opacity: 1, y: 0 }}       // fade in + rise up
-      transition={{ duration: 0.9, ease: "easeOut" }} 
-      className="w-full lg:w-[70%] mt-5 border-white border-3 border-dotted p-2 lg:p-4 space-y-4"
-    >
-      <motion.h1
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15, duration: 0.5 }}
-        className="text-3xl md:text-4xl"
-      >
-        What is Confesso?
-      </motion.h1>
-
-      <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.25, duration: 0.5 }}
-        className="text-blue-700 px-4 text-xl"
-      >
-        Ever had something on your mind you couldn’t tell anyone? Confesso is
-        your anonymous space to spill secrets, share stories, or just vent —
-        no names, no judgment.
-      </motion.p>
-
-      <motion.h1
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.35, duration: 0.5 }}
-        className="text-3xl md:text-4xl"
-      >
-        How it works:
-      </motion.h1>
-
-      {/* LIST fades in all at once */}
-      <motion.ul
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.9, duration: 0.5 }}
-        className="list-none p-0 m-0 grid gap-3 text-blue-700"
-      >
-        <li className="flex items-center gap-3">
-          <Edit size={22} strokeWidth={1.6} aria-hidden="true" />
-          <span className="text-base">
-            Write it: Type out whatever’s on your mind.
-          </span>
-        </li>
-
-        <li className="flex items-center gap-3">
-          <Mail size={22} strokeWidth={1.6} aria-hidden="true" />
-          <span className="text-base">
-            Share it: Hit send, stay anonymous.
-          </span>
-        </li>
-
-        <li className="flex items-center gap-3">
-          <MessageCircle size={22} strokeWidth={1.6} aria-hidden="true" />
-          <span className="text-base">
-            Connect: Read confessions from others who get it.
-          </span>
-        </li>
-      </motion.ul>
-
-      <motion.h4
-        initial={{ opacity: 0, x: 90 } }
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.9, duration: 0.8 }}
-        className="text-white text-xl mt-4"
-      >
-        Confessions big or small — everyone has a story. What’s yours?
-      </motion.h4>
-    </motion.div>
-      </div>
-      <p className="text-center mt-8 text-2xl md:text-3xl">
-        First time coming to our page? No problems!
-      </p>
-      <p className="text-center mt-8 text-2xl md:text-3xl">
-        <Link
-          href="/auth"
-          className="text-blue-700 underline hover:text-blue-600"
+      <section className="hero">
+        <motion.p
+          className="eyebrow"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
         >
-          Sign up here
+          A quieter corner of the internet
+        </motion.p>
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.08 }}
+        >
+          Some things are easier to say <em>without a name.</em>
+        </motion.h1>
+        <motion.p
+          className="hero-copy"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.16 }}
+        >
+          Confesso is an anonymous space for the thoughts, secrets, and small
+          truths you need to let out. No profiles. No pressure. No judgment.
+        </motion.p>
+        <motion.div
+          className="hero-actions"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.24 }}
+        >
+          <Link className="button button-primary" href="/auth">
+            Share a confession <ArrowRight size={18} />
+          </Link>
+          <a className="text-link" href="#how-it-works">
+            How it works
+          </a>
+        </motion.div>
+        <motion.div
+          className="thought-card"
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.3 }}
+        >
+          <Send size={18} aria-hidden="true" />
+          <p>“I didn’t need advice. I just needed somewhere safe to say it.”</p>
+          <span>— anonymous</span>
+        </motion.div>
+      </section>
+      <section id="how-it-works" className="steps-section">
+        <div className="section-intro">
+          <p className="eyebrow">No complicated rules</p>
+          <h2>A little space can make a big difference.</h2>
+        </div>
+        <div className="steps-grid">
+          {steps.map(({ icon: Icon, title, text }, index) => (
+            <article className="step" key={title}>
+              <span className="step-number">0{index + 1}</span>
+              <Icon aria-hidden="true" size={24} />
+              <h3>{title}</h3>
+              <p>{text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+      <section id="community" className="community-section">
+        <div>
+          <p className="eyebrow">You’re welcome here</p>
+          <h2>Your story can stay yours.</h2>
+          <p>
+            Whether it feels enormous or impossibly small, it deserves room to
+            exist. Start with one honest sentence.
+          </p>
+        </div>
+        <Link className="button button-light" href="/auth">
+          Begin anonymously <ArrowRight size={18} />
         </Link>
-        <span> to continue to Confesso</span>
-      </p>
-    </div>
+      </section>
+    </main>
   );
 }
