@@ -1,10 +1,10 @@
 import * as yup from "yup";
 
 export const signupSchema = yup.object().shape({
-  name: yup
+  username: yup
     .string()
-    .required("Please enter your name")
-    .min(5, "Name must be at least 5 characters"),
+    .required("Username is required")
+    .min(3, "Username must be at least 3 characters"),
   email: yup
     .string()
     .email("Please enter a valid email")
@@ -20,11 +20,4 @@ export const signupSchema = yup.object().shape({
       /[!@#$%*?&]/,
       "Password must contain at least one special character"
     ),
-  confirmPassword: yup
-    .string()
-    .required("Please confirm password")
-    .oneOf([yup.ref("password"), null], "Passwords must match"),
-  address: yup.string().notRequired(),
-  dob: yup.string().notRequired(),
-  gender: yup.string(). notRequired()
 });
