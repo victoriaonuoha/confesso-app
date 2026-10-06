@@ -138,7 +138,7 @@ export default function FeedPage() {
       const distanceFromBottom =
         pageHeight - scrollPosition;
 
-      if (distanceFromBottom <= 500) {
+      if (distanceFromBottom <= 700) {
         loadMore();
       }
     };

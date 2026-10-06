@@ -1,6 +1,14 @@
 import Link from "next/link";
 import { Heart } from "lucide-react";
 
+export const metadata = {
+  title: "Authentication",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+
 export default function Layout({ children }) {
   return (
     <main className="grid min-h-screen grid-cols-[minmax(320px,.9fr)_1.1fr] max-[720px]:grid-cols-1">
