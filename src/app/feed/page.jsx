@@ -19,8 +19,15 @@ export default function FeedPage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
 
-  const observerRef = useRef(null);
+  // Prevent duplicate requests
   const loadingMoreRef = useRef(false);
+
+  // Prevent duplicate initial request
+  const initialLoadRef = useRef(false);
+
+  // --------------------------------------------------
+  // LOAD CONFESSIONS
+  // --------------------------------------------------
 
   const loadConfessions = useCallback(async (pageNumber) => {
     try {
@@ -46,12 +53,13 @@ export default function FeedPage() {
       );
     } finally {
       setLoading(false);
-      setLoadingMore(false);
-      loadingMoreRef.current = false;
     }
   }, []);
 
-  // Check authentication and load the first page
+  // --------------------------------------------------
+  // INITIAL LOAD
+  // --------------------------------------------------
+
   useEffect(() => {
     const token = localStorage.getItem(
       "confesso_access_token"
@@ -62,12 +70,20 @@ export default function FeedPage() {
       return;
     }
 
+    if (initialLoadRef.current) {
+      return;
+    }
+
+    initialLoadRef.current = true;
+
     loadConfessions(1);
   }, [router, loadConfessions]);
 
-  // Load the next page
+  // --------------------------------------------------
+  // LOAD NEXT PAGE
+  // --------------------------------------------------
+
   const loadMore = useCallback(async () => {
-    // Prevent duplicate requests
     if (
       loadingMoreRef.current ||
       !hasNext
@@ -78,50 +94,89 @@ export default function FeedPage() {
     loadingMoreRef.current = true;
     setLoadingMore(true);
 
-    await loadConfessions(page + 1);
+    try {
+      await loadConfessions(page + 1);
+    } finally {
+      loadingMoreRef.current = false;
+      setLoadingMore(false);
+    }
   }, [
-    hasNext,
     page,
+    hasNext,
     loadConfessions,
   ]);
 
-  // Observe the bottom of the feed
+  // --------------------------------------------------
+  // AUTOMATIC SCROLL PAGINATION
+  // --------------------------------------------------
+
   useEffect(() => {
-    const element = observerRef.current;
-
-    if (!element) {
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (
-          entries[0]?.isIntersecting &&
-          !loadingMoreRef.current
-        ) {
-          loadMore();
-        }
-      },
-      {
-        root: null,
-        rootMargin: "500px",
-        threshold: 0,
+    const handleScroll = () => {
+      // Don't do anything while the first page is loading
+      if (loading) {
+        return;
       }
+
+      // Don't do anything if there are no more pages
+      if (!hasNext) {
+        return;
+      }
+
+      // Don't start another request while one is running
+      if (loadingMoreRef.current) {
+        return;
+      }
+
+      const scrollPosition =
+        window.innerHeight + window.scrollY;
+
+      const pageHeight =
+        document.documentElement.scrollHeight;
+
+      // Start loading when the user is 500px
+      // away from the bottom.
+      const distanceFromBottom =
+        pageHeight - scrollPosition;
+
+      if (distanceFromBottom <= 500) {
+        loadMore();
+      }
+    };
+
+    window.addEventListener(
+      "scroll",
+      handleScroll,
+      { passive: true }
     );
 
-    observer.observe(element);
+    // Also check immediately after rendering.
+    // This handles cases where the page is short
+    // enough that the user doesn't need to scroll.
+    handleScroll();
 
     return () => {
-      observer.disconnect();
+      window.removeEventListener(
+        "scroll",
+        handleScroll
+      );
     };
-  }, [loadMore]);
+  }, [
+    loading,
+    hasNext,
+    loadMore,
+  ]);
+
+  // --------------------------------------------------
+  // PAGE
+  // --------------------------------------------------
 
   return (
     <div className="min-h-screen bg-[#08080c] text-white">
       <Header />
 
       <main className="mx-auto max-w-2xl px-4 pb-28 pt-8 sm:px-6">
-        {/* Page introduction */}
+
+        {/* PAGE INTRODUCTION */}
         <section className="mb-8">
           <p className="text-sm font-medium text-purple-400">
             Confesso
@@ -137,7 +192,7 @@ export default function FeedPage() {
           </p>
         </section>
 
-        {/* Create post prompt */}
+        {/* CREATE POST PROMPT */}
         <button
           onClick={() => router.push("/create")}
           className="mb-7 flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left transition hover:border-purple-500/30 hover:bg-white/[0.05]"
@@ -157,7 +212,7 @@ export default function FeedPage() {
           </span>
         </button>
 
-        {/* Error */}
+        {/* ERROR */}
         {error && (
           <div className="mb-6 rounded-2xl border border-red-500/20 bg-red-500/10 p-4">
             <p className="text-sm text-red-300">
@@ -166,6 +221,7 @@ export default function FeedPage() {
 
             <button
               onClick={() => {
+                setError("");
                 setLoading(true);
                 loadConfessions(1);
               }}
@@ -176,14 +232,14 @@ export default function FeedPage() {
           </div>
         )}
 
-        {/* Initial loading */}
+        {/* INITIAL LOADING */}
         {loading && (
           <div className="flex justify-center py-12">
             <div className="h-7 w-7 animate-spin rounded-full border-2 border-white/10 border-t-purple-400" />
           </div>
         )}
 
-        {/* Empty state */}
+        {/* EMPTY STATE */}
         {!loading &&
           !error &&
           confessions.length === 0 && (
@@ -205,7 +261,7 @@ export default function FeedPage() {
             </div>
           )}
 
-        {/* Confession feed */}
+        {/* CONFESSION FEED */}
         {!loading &&
           confessions.length > 0 && (
             <div className="space-y-5">
@@ -218,25 +274,22 @@ export default function FeedPage() {
             </div>
           )}
 
-        {/* Pagination trigger */}
-        {!loading && (
-          <div
-            ref={observerRef}
-            className="flex min-h-20 items-center justify-center py-8"
-          >
-            {loadingMore && (
-              <div className="h-6 w-6 animate-spin rounded-full border-2 border-white/10 border-t-purple-400" />
-            )}
-
-            {!loadingMore &&
-              !hasNext &&
-              confessions.length > 0 && (
-                <p className="text-center text-xs text-gray-600">
-                  You've reached the end.
-                </p>
-              )}
+        {/* LOADING NEXT PAGE */}
+        {!loading && loadingMore && (
+          <div className="flex justify-center py-8">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-white/10 border-t-purple-400" />
           </div>
         )}
+
+        {/* END OF FEED */}
+        {!loading &&
+          !loadingMore &&
+          !hasNext &&
+          confessions.length > 0 && (
+            <p className="py-8 text-center text-xs text-gray-600">
+              You've reached the end.
+            </p>
+          )}
       </main>
 
       <BottomNav />
